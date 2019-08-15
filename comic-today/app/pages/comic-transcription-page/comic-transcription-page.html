@@ -1,0 +1,82 @@
+<link rel="import" href="../../../components/cells-page/cells-page.html">
+<link rel="import" href="../../../components/cells-molecule-spinner-veil/cells-molecule-spinner-veil.html">
+
+<dom-module id="comic-transcription-page">
+  <template>
+    <style is="custom-style">
+      .container {
+        padding-bottom: 140px;
+        margin: 20px 20px 40px;
+        position: relative;
+      }
+
+      .container h2 {
+        padding-top: 20%;
+        color: white;
+        text-align: center;
+        font-family: sans-serif;
+      }
+
+      .container:after {
+        content: '';
+        display: block;
+        clear: both;
+      }
+
+      .center-content {
+        display: flex;
+        justify-content: center;
+        flex-direction: row;
+        margin-bottom: 5px;
+      }
+
+      .transcription {
+        padding: 5px;
+      }
+    </style>
+
+    <cells-template-paper-drawer-panel mode="seamed">
+      <div slot="app__header">
+        <cells-component-app-header
+          text=[[_formatTitle(params.title)]]
+          icon-left="back"
+          on-left-button-pressed='_handleBackStep'>
+        </cells-component-app-header>
+      </div>
+
+      <div slot="app__main">
+        <template is="dom-if" if="[[!loading]]">
+          <template is="dom-repeat" items="[[transcription]]">
+            <p class="transcription">[[item]]</p>
+          </template>
+
+          <template is="dom-if" if="[[!transcription]]">
+            <div class="center-content">
+              <h4>No transcription found for given comic.</h4>
+            </div>
+          </template>
+
+          <div class="center-content">
+            <cells-st-button id="transcriptionBtn" on-click="_handleBackStep">
+              <button>Go back</button>
+            </cells-st-button>
+          </div>
+        </template>
+
+        <template is="dom-if" if="[[loading]]">
+          <cells-molecule-spinner-veil
+            open>
+          </cells-molecule-spinner-veil>
+        </template>
+
+        <comic-dm
+          id="comicDM"
+          number=[[params.num]]
+          on-comic-request-ok="_handleRequestSuccess">
+        </comic-dm>
+      </div>
+    </cells-template-paper-drawer-panel>
+  </template>
+
+  <script src="comic-transcription-page.js"></script>
+</dom-module>

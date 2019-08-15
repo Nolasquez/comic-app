@@ -2,6 +2,7 @@
   "name": "comic-today",
   "version": "0.1.0",
   "dependencies": {
+    "cells-polymer-bridge":  "^3.0.0",
     "cells-template-paper-drawer-panel": "^12.1.0",
     "web-component-tester": "6.6.0-pre.5",
     "cells-image-card": "^12.3.0",

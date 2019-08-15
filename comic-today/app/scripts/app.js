@@ -3,7 +3,9 @@
 
   window.CellsPolymer.start({
     routes: {
-      'home': '/'
+      'home': '/',
+      'comic-transcription': '/transcription/:num/:title'
     }
   });
+
 }(document));

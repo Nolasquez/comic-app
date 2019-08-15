@@ -4,7 +4,7 @@
     "i18nPath": "locales/",
     "componentsPath": "./components/",
     "composerEndpoint": "./composerMocks/",
-    "pages": [],
+    "pages": [ "comic-transcription" ],
     "pagesPath": "./pages/",
     "appId": "",
     "debug": true,
