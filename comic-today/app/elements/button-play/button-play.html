@@ -84,8 +84,12 @@
         }
 
         _transcriptionClicked() {
-          const detail = { number: this.number, title: this._normalizeUriString(this.title) };
-
+          const detail = { 
+            //number: this.number, 
+            //title: this._normalizeUriString(this.title) 
+            number: 1, 
+            title: "demo"         
+          };
           this.dispatchEvent(new CustomEvent('transcription-clicked', {composed: true, bubbles: true, detail }));
         }
 

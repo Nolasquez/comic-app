@@ -2,170 +2,271 @@
 
 <dom-module id="comic-dm">
 
-  <template>
-    <cells-generic-dp
-      id="comicDP"
-      host="https://any-api.com:3010"
-      path="http://xkcd.com/info.0.json"
-      method="GET"
-      on-request-success="_onRequestOk"
-      on-request-error="_onRequestError">
-    </cells-generic-dp>
-  </template>
+ <template>
+   <cells-generic-dp
+     id="comicDP"
+     host=""
+     path="api"
+     method="GET"
+     on-request-success="_onRequestOk"
+     on-request-error="_onRequestError">
+   </cells-generic-dp>
+ </template>
 
-  <script>
-    {
-      // Define the element's API using an ES2015 class
-      class ComicDM extends Polymer.Element {
-        static get is() {
-          return 'comic-dm';
-        }
+ <script>
+   {
+     // Define the element's API using an ES2015 class
+     class ComicDM extends Polymer.Element {
+       static get is() {
+         return 'comic-dm';
+       }
 
-        // Declare properties for the element's public API
-        static get properties() {
-          return {
-            number: {
-              type: Number,
-              notify: true
-            },
-            image: {
-              type: String,
-              notify: true
-            },
-            title: {
-              type: String,
-              notify: true
-            },
-            date: {
-              type: Object,
-              notify: true
-            },
-            alt: {
-              type: String,
-              notify: true
-            },
-            transcript: {
-              type: String,
-              notify: true
-            },
-            label: {
-              type: String,
-              notify: true,
-              computed: '_computeLabel(title, date)'
-            },
-            initialLoadHandled: {
-              type: Boolean,
-              value: false
-            }
-          };
-        }
+       // Declare properties for the element's public API
+       static get properties() {
+         return {
+           number: {
+             type: Number,
+             notify: true
+           },
+           image: {
+             type: String,
+             notify: true
+           },
+           title: {
+             type: String,
+             notify: true
+           },
+           date: {
+             type: Object,
+             notify: true
+           },
+           alt: {
+             type: String,
+             notify: true
+           },
+           transcript: {
+             type: String,
+             notify: true
+           },
+           label: {
+             type: String,
+             notify: true,
+             computed: '_computeLabel(title, date)'
+           },
+           initialLoadHandled: {
+             type: Boolean,
+             value: false
+           }
+         };
+       }
 
-        ready() {
-          super.ready();
+       ready() {
+         super.ready();
 
-          this.todayNumber = undefined;
-        }
+         this.todayNumber = undefined;
+       }
 
-        _computeLabel(title, date) {
-          if (!(title && date)) {
-            return '';
+       _computeLabel(title, date) {
+         if (!(title && date)) {
+           return '';
+         }
+
+         return `${title}. Published in ${date.day}/${date.month}/${date.year}`;
+       }
+
+       getCurrent() {
+         if (!this.initialLoadHandled) {
+           this._doRequest();
+         }
+       }
+
+       getDetail() {
+         console.log("getDetail");
+         //const path = `${this.number}`;
+         const path = "";
+         //console.log("getDetail "+path);
+         this._doRequest(path);
+       }
+
+       getPrevious() {
+         //const path = `${this.number - 1}`;
+         const path = "";
+         //console.log("getPrevious"+path);
+         this._doRequest(path);
+       }
+
+       getRandom() {
+         //const randomNumber = Math.trunc(Math.random() * this.todayNumber);
+         //const path = `${randomNumber}`;
+         const path = "";
+         //console.log("getRandom"+path);
+         this._doRequest(path);
+       }
+
+       getNext() {
+         //const path = `${this.number + 1}`;
+         const path = "";
+         //console.log("getNext"+path);
+         this._doRequest(path);
+       }
+
+       _onRequestOk(evt) {
+        //console.log("_onRequestOk");
+        const data = evt.detail.results; 
+        //console.log(data);
+        
+        const [
+          {
+            gender,
+            name:{
+              first, last
+            },
+            email,
+            phone, 
+            picture:{
+              large
+            },
+            nat,
+            cell
           }
+        ] 
+        = data;
+        
+        
+        //console.log("name: "+gender);
+        //console.log("name: "+first, last);
+        //console.log("name: "+email);
+        //console.log("name: "+phone);
+        //console.log("name: "+large);
+        //console.log("name: "+nat);
+        //console.log("name: "+cell);
+        var indice = 1;
+        this.setProperties({
+          number: indice,
+          image: large,
+          title: email,
+          date: name, 
+          alt: cell,
+          transcript: nat
+            /*
+           number,
+           image,
+           alt,
+           transcript,
+           title,
+           date
+           */
+         });
 
-          return `${title}. Published in ${date.day}/${date.month}/${date.year}`;
-        }
+          //console.log(this.number);
+          //console.log(this.image);
+          //console.log(this.title);
+          //console.log(this.date);
+          //console.log(this.alt);
+          //console.log(this.transcript);
+          //console.log(this.label);
+          //console.log(this.initialLoadHandled);
 
-        getCurrent() {
-          if (!this.initialLoadHandled) {
-            this._doRequest();
-          }
-        }
+        /*
+         if (!this.todayNumber) {
+           this.todayNumber = data.num;
+         }
+        */
+         if (!this.initialLoadHandled) {
+           this.initialLoadHandled = true;
+         }
 
-        getDetail() {
-          const path = `${this.number}`;
+         if (data.num === this.todayNumber) {
+           // BE AWARE! If you are not sending a payload, you can use 'Event' instead of 'CustomEvent'
+           // resource: https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Creating_and_triggering_events
+           this.dispatchEvent(new Event('comic-last-reached'));
+         } else if (data.num === 1) {
+           // BE AWARE! If you are not sending a payload, you can use 'Event' instead of 'CustomEvent'
+           // resource: https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Creating_and_triggering_events
+           this.dispatchEvent(new Event('comic-first-reached'));
+         } else {
+           // BE AWARE! If you are not sending a payload, you can use 'Event' instead of 'CustomEvent'
+           // resource: https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Creating_and_triggering_events
+           this.dispatchEvent(new Event('comic-more-left'));
+         }
 
-          this._doRequest(path);
-        }
+         // Payload being sent. We need to use a 'CustomEvent' instead of 'Event'.
+         this.dispatchEvent(new CustomEvent('comic-request-ok', {detail: data}));
 
-        getPrevious() {
-          const path = `${this.number - 1}`;
+        /*
+        
+         const data = evt.detail;
+         const { num: number, img: image, alt, transcript, title, year, month, day } = data;
+         const date = { year, month, day };
 
-          this._doRequest(path);
-        }
+         this.setProperties({
+           number,
+           image,
+           alt,
+           transcript,
+           title,
+           date
+         });
 
-        getRandom() {
-          const randomNumber = Math.trunc(Math.random() * this.todayNumber);
-          const path = `${randomNumber}`;
+         if (!this.todayNumber) {
+           this.todayNumber = data.num;
+         }
 
-          this._doRequest(path);
-        }
+         if (!this.initialLoadHandled) {
+           this.initialLoadHandled = true;
+         }
 
-        getNext() {
-          const path = `${this.number + 1}`;
+         if (data.num === this.todayNumber) {
+           // BE AWARE! If you are not sending a payload, you can use 'Event' instead of 'CustomEvent'
+           // resource: https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Creating_and_triggering_events
+           this.dispatchEvent(new Event('comic-last-reached'));
+         } else if (data.num === 1) {
+           // BE AWARE! If you are not sending a payload, you can use 'Event' instead of 'CustomEvent'
+           // resource: https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Creating_and_triggering_events
+           this.dispatchEvent(new Event('comic-first-reached'));
+         } else {
+           // BE AWARE! If you are not sending a payload, you can use 'Event' instead of 'CustomEvent'
+           // resource: https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Creating_and_triggering_events
+           this.dispatchEvent(new Event('comic-more-left'));
+         }
 
-          this._doRequest(path);
-        }
+         // Payload being sent. We need to use a 'CustomEvent' instead of 'Event'.
+         this.dispatchEvent(new CustomEvent('comic-request-ok', {detail: data}));
+         */
+       }
 
-        _onRequestOk(evt) {
-          const data = evt.detail;
-          const { num: number, img: image, alt, transcript, title, year, month, day } = data;
-          const date = { year, month, day };
+       _onRequestError(err) {
+         //console.log("_onRequestError");
+         // BE AWARE! If you are not sending a payload, you can use 'Event' instead of 'CustomEvent'
+         // resource: https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Creating_and_triggering_events
+         this.dispatchEvent(new Event('comic-request-error'));
+       }
 
-          this.setProperties({
-            number,
-            image,
-            alt,
-            transcript,
-            title,
-            date
-          });
+       _doRequest(path, type = 'comic-request-start') {
+         //console.log("_doRequest");
+         //const _path = (path ? `${path}/` : '') + 'api';
+         //console.log("_path "+_path);
+         //const url = `https://randomuser.me/${_path}`;
+         //console.log("url "+url);
+         //this.$.comicDP.path = "https://xkcd.com/info.0.json";
+         this.$.comicDP.host = "https://randomuser.me";
+         this.$.comicDP.path = "api";
+         //this.$.comicDP.params = { 'locale': this.locale };
+         //this.$.comicDP.headers = { 'X-RapidAPI-Host': 'omgvamp-hearthstone-v1.p.rapidapi.com', 'X-RapidAPI-Key': 'd84526af40msh07aa918e2c460f5p168206jsn07d86828abcf' };
+         this.$.comicDP.method = 'GET';
+         this.$.comicDP.generateRequest();
 
-          if (!this.todayNumber) {
-            this.todayNumber = data.num;
-          }
+         //console.log("this.$.comicDP: "+this.$.comicDP);
+         this.$.comicDP.generateRequest();
+        
+         // BE AWARE! If you are not sending a payload, you can use 'Event' instead of 'CustomEvent'
+         // resource: https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Creating_and_triggering_events
+         this.dispatchEvent(new Event(type));
+       }
+     }
 
-          if (!this.initialLoadHandled) {
-            this.initialLoadHandled = true;
-          }
-
-          if (data.num === this.todayNumber) {
-            // BE AWARE! If you are not sending a payload, you can use 'Event' instead of 'CustomEvent'
-            // resource: https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Creating_and_triggering_events
-            this.dispatchEvent(new Event('comic-last-reached'));
-          } else if (data.num === 1) {
-            // BE AWARE! If you are not sending a payload, you can use 'Event' instead of 'CustomEvent'
-            // resource: https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Creating_and_triggering_events
-            this.dispatchEvent(new Event('comic-first-reached'));
-          } else {
-            // BE AWARE! If you are not sending a payload, you can use 'Event' instead of 'CustomEvent'
-            // resource: https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Creating_and_triggering_events
-            this.dispatchEvent(new Event('comic-more-left'));
-          }
-
-          // Payload being sent. We need to use a 'CustomEvent' instead of 'Event'.
-          this.dispatchEvent(new CustomEvent('comic-request-ok', {detail: data}));
-        }
-
-        _onRequestError(err) {
-          // BE AWARE! If you are not sending a payload, you can use 'Event' instead of 'CustomEvent'
-          // resource: https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Creating_and_triggering_events
-          this.dispatchEvent(new Event('comic-request-error'));
-        }
-
-        _doRequest(path, type = 'comic-request-start') {
-          const _path = (path ? `${path}/` : '') + 'info.0.json';
-          const url = `http://xkcd.com/${_path}`;
-
-          this.$.comicDP.path = url;
-          this.$.comicDP.generateRequest();
-
-          // BE AWARE! If you are not sending a payload, you can use 'Event' instead of 'CustomEvent'
-          // resource: https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Creating_and_triggering_events
-          this.dispatchEvent(new Event(type));
-        }
-      }
-
-      // Register the custom element with the browser
-      customElements.define(ComicDM.is, ComicDM);
-    }
-  </script>
+     // Register the custom element with the browser
+     customElements.define(ComicDM.is, ComicDM);
+   }
+ </script>
 </dom-module>

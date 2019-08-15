@@ -23,6 +23,7 @@
     }
 
     ready() {
+      console.log(this.ready);
       super.ready();
 
       this._handleConnections();
@@ -41,12 +42,15 @@
     }
 
     _handleTranscription() {
+      console.log("_handleTranscription");
       const { num } = this.params;
       const shouldLoadTranscription = (!this.num || this.num && this.num !== num);
 
       if (shouldLoadTranscription) {
+        console.log("shouldLoadTranscription");
         this.num = num;
         this.loading = true;
+        console.log(this.$.comicDM);
         this.$.comicDM.getDetail();
       }
     }
@@ -62,8 +66,9 @@
     _handleRequestSuccess(evt) {
       const { detail } = evt;
       const { transcript } = detail;
-
-      this.markdown = this._formatMarkdown(transcript);
+      console.log("detail: "+ evt);
+      console.log("transcript: "+detail);
+      //this.markdown = this._formatMarkdown(transcript);
       this.transcription = this._formatTranscription(transcript);
       this.loading = false;
     }
